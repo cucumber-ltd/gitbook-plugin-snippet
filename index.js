@@ -7,10 +7,6 @@ module.exports = {
       const re = /^\s*\[snippet\]\(([^#\)]+)#?([^\)]+)?\)\s*$/gm
 
       const dir = path.dirname(page.rawPath)
-      // construct path from gitbook binary to target include
-      const makePath = function (filename) {
-        return path.join(dir, filename)
-      }
 
       const sourceByFilepath = {}
       const readFilePromises = []
@@ -20,7 +16,7 @@ module.exports = {
       let res
       while (res = re.exec(page.content)) {
         const filename = res[1]
-        const filepath = makePath(filename)
+        const filepath = path.join(dir, filename)
         readFilePromises.push(new Promise((resolve) => {
           fs.readFile(filepath, "utf-8", (err, source) => {
             if (err) return resolve()
@@ -35,7 +31,7 @@ module.exports = {
       return Promise.all(readFilePromises)
         .then(() => {
           page.content = page.content.replace(re, function (match, filename, fragment) {
-            const filepath = makePath(filename)
+            const filepath = path.join(dir, filename)
             const source = sourceByFilepath[filepath]
             if (!source) return `${match} *FILE NOT FOUND: ${filename}*`
             if (!fragment) return source
