@@ -68,4 +68,27 @@ two
       })
   })
 
+  it("preserves the link and appends FILE NOT FOUND", () => {
+    const page = {
+      rawPath: __filename,
+      content: `[snippet](nosuch.js)`
+    }
+    return plugin.hooks['page:before'](page)
+      .then(() => {
+        const expected =  `[snippet](nosuch.js) *FILE NOT FOUND: nosuch.js*`
+        assert.equal(page.content, expected)
+      })
+  })
+
+  it("preserves the link and appends FRAGMENT NOT FOUND", () => {
+    const page = {
+      rawPath: __filename,
+      content: `[snippet](hello.rb#nosuch)`
+    }
+    return plugin.hooks['page:before'](page)
+      .then(() => {
+        const expected =  `[snippet](hello.rb#nosuch) *FRAGMENT NOT FOUND: hello.rb#nosuch*`
+        assert.equal(page.content, expected)
+      })
+  })
 })

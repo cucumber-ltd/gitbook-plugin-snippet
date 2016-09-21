@@ -21,9 +21,9 @@ module.exports = {
       while (res = re.exec(page.content)) {
         const filename = res[1]
         const filepath = makePath(filename)
-        readFilePromises.push(new Promise((resolve, reject) => {
+        readFilePromises.push(new Promise((resolve) => {
           fs.readFile(filepath, "utf-8", (err, source) => {
-            if (err) return reject(err)
+            if (err) return resolve()
             sourceByFilepath[filepath] = source
             resolve()
           })
@@ -37,10 +37,11 @@ module.exports = {
           page.content = page.content.replace(re, function (match, filename, fragment) {
             const filepath = makePath(filename)
             const source = sourceByFilepath[filepath]
+            if (!source) return `${match} *FILE NOT FOUND: ${filename}*`
             if (!fragment) return source
             const fragmentRegexp = new RegExp(`[\\s\\S]*(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`)
             const m = source.match(fragmentRegexp)
-            if(!m) throw new Error(`Fragment [${fragment}] not found in ${filepath}`)
+            if (!m) return `${match} *FRAGMENT NOT FOUND: ${filename}#${fragment}*` //throw new Error(`Fragment [${fragment}] not found in ${filepath}`)
             return unindent(m[1])
           })
           return page
@@ -51,6 +52,6 @@ module.exports = {
 
 const unindent = s => {
   // https://twitter.com/gasparnagy/status/778134306128551940
-  for(;!s.match(/^\S/m);s = s.replace(/^\s/gm, ''));
+  for (; !s.match(/^\S/m); s = s.replace(/^\s/gm, ''));
   return s
 }
