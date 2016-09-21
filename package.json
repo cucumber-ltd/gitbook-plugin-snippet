@@ -2,6 +2,9 @@
   "name": "gitbook-plugin-snippet",
   "version": "1.0.0",
   "description": "Quote a fragment of a source file",
+  "engines": {
+    "gitbook": ">2.x.x"
+  },
   "main": "index.js",
   "scripts": {
     "test": "mocha"
