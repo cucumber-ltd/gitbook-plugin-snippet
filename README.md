@@ -1,6 +1,8 @@
 # Snippets for GitBook
 
-Include entire code files or snippets of code files in your pages.
+Include entire code files or fragments of code files in your pages.
+
+## Installation
 
 ```
 {
@@ -10,15 +12,15 @@ Include entire code files or snippets of code files in your pages.
 }
 ```
 
-## Whole files
+## Include entire file
 
-Let's say you have `some/file.rb`:
+Let's say you have a file `some/file.rb`:
 
 ```ruby
 puts "hello"
 ```
 
-You can slurp that into a Markdown file:
+You can include its contents in a document as follows:
 
     Look at this code:
 
@@ -26,7 +28,7 @@ You can slurp that into a Markdown file:
     [snippet](some/file.rb)
     ```
 
-This will replace the `[snippet](...)` link with the entire contents of the file:
+The `[snippet](...)` link will be replaced with the entire contents of the file:
 
     Look at this code:
 
@@ -34,26 +36,27 @@ This will replace the `[snippet](...)` link with the entire contents of the file
     puts "hello"
     ```
 
-## Fragments
+## Include fragments from files
 
-Let's say you have `some/file-with-fragments.rb` with [doxygen-like](https://www.stack.nl/~dimitri/doxygen/manual/commands.html#cmdsnippet) fragments:
+Let's say you have a file `some/file-with-fragment.rb` with 
+[doxygen-like](https://www.stack.nl/~dimitri/doxygen/manual/commands.html#cmdsnippet) block markers:
 
 ```ruby
 class Fragment
-  ### [the-fragment]
+  ### [the-marker]
   if true
     puts "the fragment"
   end
-  ### [the-fragment]
+  ### [the-marker]
 end
 ```
 
-Slurp in just the fragment:
+You can include just the fragment between the markers as follows:
 
     Look at this code:
 
     ```ruby
-    [snippet](some/file-with-fragments.rb#the-fragment)
+    [snippet](some/file-with-fragment.rb#the-marker)
     ```
 
 Result:
