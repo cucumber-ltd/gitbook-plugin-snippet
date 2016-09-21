@@ -26,7 +26,7 @@ three
       })
   })
 
-  it("includes unindented fragment", () => {
+  it("includes unindented ### fragment", () => {
     const page = {
       rawPath: __filename,
       content: `one
@@ -46,4 +46,26 @@ two
         assert.equal(page.content, expected)
       })
   })
+
+  it("includes unindented /// fragment", () => {
+    const page = {
+      rawPath: __filename,
+      content: `one
+[snippet](fragment.js#the-fragment)
+two
+`
+    }
+    return plugin.hooks['page:before'](page)
+      .then(() => {
+        const expected = `one
+if (true) {
+  console.log("the fragment")
+}
+
+two
+`
+        assert.equal(page.content, expected)
+      })
+  })
+
 })

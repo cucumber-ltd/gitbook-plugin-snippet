@@ -38,8 +38,9 @@ module.exports = {
             const filepath = makePath(filename)
             const source = sourceByFilepath[filepath]
             if (!fragment) return source
-            const fragmentRegexp = new RegExp(`[\\s\\S]*###\\s*\\[${fragment}\\]([\\s\\S]*)###\\s*\\[${fragment}\\]`)
+            const fragmentRegexp = new RegExp(`[\\s\\S]*(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`)
             const m = source.match(fragmentRegexp)
+            if(!m) throw new Error(`Fragment [${fragment}] not found in ${filepath}`)
             return unindent(m[1])
           })
           return page
