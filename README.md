@@ -4,7 +4,9 @@ Include entire code files or snippets of code files in your pages.
 
 ```
 {
-  "plugins": ["snippet"],
+  "plugins": [
+    "snippet@git+https://github.com/cucumber-ltd/gitbook-plugin-snippet.git"
+  ]
 }
 ```
 
