@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#
+# Prints a file from git
+#
+# Usage:
+#
+#   bin/gitcat "commit message" path/to/file
+#
+# The commit message can be just a substring of the commit message
+#
+commitmessage=$1
+filepath=$(realpath $2)
+repopath=$(git rev-parse --show-toplevel)
+gitpath=$(echo "${filepath}" | sed "s|${repopath}/||")
+
+sha=$(git log --all --grep="${commitmessage}" --format=format:%H | head -1)
+git show ${sha}:${gitpath}

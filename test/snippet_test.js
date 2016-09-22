@@ -123,4 +123,27 @@ two
     })
   })
 
+  describe("git history", () => {
+    it("includes the fragment from file based on commit message", () => {
+      const commitMessage = "very special"
+      const page = {
+        rawPath: __filename,
+        content: `one
+[snippet](on-branch.rb#marker@${commitMessage})
+two
+`
+      }
+      return plugin.hooks['page:before'].bind(instance)(page)
+        .then(() => {
+          const expected = `one
+
+puts "world"
+
+two
+`
+          assert.equal(page.content, expected)
+        })
+    })
+  })
+
 })

@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const child_process = require('child_process')
 
 module.exports = {
   hooks: {
@@ -23,26 +24,42 @@ module.exports = {
         return message
       }
 
-      const snippetRegexp = /^\s*\[snippet\]\(([^#\)]+)#?([^\)]+)?\)\s*$/gm
-
       const dir = path.dirname(page.rawPath)
-
       const sourceByFilepath = {}
       const readFilePromises = []
+
+      const readFile = (filepath) => {
+        return new Promise((resolve) => {
+          fs.readFile(filepath, "utf-8", (err, source) => {
+            if (err) return resolve() // We'll error later, when the file is not found
+            sourceByFilepath[filepath] = source
+            resolve()
+          })
+        })
+      }
+
+      const gitCat = (commitMessage, filepath) => {
+        return new Promise((resolve) => {
+          child_process.exec(`${__dirname}/bin/gitcat "${commitMessage}" "${filepath}"`, (err, source) => {
+            if (err) return resolve() // We'll error later, when the file is not found
+            sourceByFilepath[filepath] = source
+            resolve()
+          })
+        })
+      }
+
+      const snippetRegexp = /^\s*\[snippet\]\(([^#\)]+)#?([^\)@]+)?@?([^\)]+)?\)\s*$/gm
 
       // find all [snippet]() statements,
       // read and cache target files
       let snippetMatch
       while (snippetMatch = snippetRegexp.exec(page.content)) {
         const filename = snippetMatch[1]
+        const commitMessage = snippetMatch[3]
         const filepath = path.join(dir, filename)
-        readFilePromises.push(new Promise((resolve) => {
-          fs.readFile(filepath, "utf-8", (err, source) => {
-            if (err) return resolve()
-            sourceByFilepath[filepath] = source
-            resolve()
-          })
-        }))
+
+        const promise = commitMessage ? gitCat(commitMessage, filepath) : readFile(filepath)
+        readFilePromises.push(promise)
       }
 
       // once all files are read, replace snippet statements with

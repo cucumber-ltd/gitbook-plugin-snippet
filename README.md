@@ -1,6 +1,7 @@
 # Snippets for GitBook
 
 Include entire code files or fragments of code files in your pages.
+Read files from file system, or from git.
 
 ## Installation
 
@@ -77,6 +78,14 @@ Result:
     ```
 
 Note that the fragment has been unindented while preserving whitespace.
+
+## Include files from git
+
+Just apend `@` after the marker, followed by the commit message (or substring of commit message). Example:
+
+    [snippet](some/file-with-fragment.rb#the-marker@this fixes a bug)
+
+All branches will be searched. If multiple commits match the commit message, the most recent one is always picked.
 
 ## Inspiration
 
