@@ -3,7 +3,26 @@ const path = require('path')
 
 module.exports = {
   hooks: {
-    'page:before': (page) => {
+    'page:before': function (page) {
+      const options = Object.assign({problem: 'error'}, this.options.pluginsConfig["snippet"])
+      const problem = (filename, message) => {
+        const fullMessage = `${filename}: ${message}`
+        switch (options.problem) {
+          case 'warn': {
+            this.log.warn(fullMessage)
+            break
+          }
+          case 'error': {
+            this.log.error(fullMessage)
+            break
+          }
+          case 'fail': {
+            throw new Error(fullMessage)
+          }
+        }
+        return message
+      }
+
       const snippetRegexp = /^\s*\[snippet\]\(([^#\)]+)#?([^\)]+)?\)\s*$/gm
 
       const dir = path.dirname(page.rawPath)
@@ -33,12 +52,12 @@ module.exports = {
           page.content = page.content.replace(snippetRegexp, (snippetLink, filename, fragment) => {
             const filepath = path.join(dir, filename)
             const source = sourceByFilepath[filepath]
-            if (!source) return `${snippetLink} *FILE NOT FOUND: ${filename}*`
+            if (!source) return problem(filename, `${snippetLink} *FILE NOT FOUND: ${filename}*`)
             if (!fragment) return source
             // find the content between two anchors, which can be "### [fragment-nane]" or "/// [fragment-nane]"
             const fragmentRegexp = new RegExp(`[\\s\\S]*(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]([\\s\\S]*)(?:###|\\/\\/\\/)\\s*\\[${fragment}\\]`)
             const fragmentMatch = source.match(fragmentRegexp)
-            if (!fragmentMatch) return `${snippetLink} *FRAGMENT NOT FOUND: ${filename}#${fragment}*`
+            if (!fragmentMatch) return problem(filename, `${snippetLink} *FRAGMENT NOT FOUND: ${filename}#${fragment}*`)
             return unindent(fragmentMatch[1])
           })
           return page

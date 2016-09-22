@@ -2,6 +2,27 @@ const assert = require('assert')
 const plugin = require('..')
 
 describe("snippet", () => {
+  let instance, errors, warnings
+
+  beforeEach(() => {
+    warnings = []
+    errors = []
+    instance = {
+      options: {
+        pluginsConfig: {
+          snippet: {
+            problem: 'warn'
+          }
+        }
+      },
+      log: {
+        warn: (message) => warnings.push(message),
+        error: (message) => errors.push(message)
+      }
+    }
+
+  })
+
   it("includes the entire file when there is no fragment", () => {
     const page = {
       rawPath: __filename,
@@ -12,7 +33,7 @@ two
 three
 `
     }
-    return plugin.hooks['page:before'](page)
+    return plugin.hooks['page:before'].bind(instance)(page)
       .then(() => {
         const expected = `one
 puts "hello"
@@ -34,7 +55,7 @@ three
 two
 `
     }
-    return plugin.hooks['page:before'](page)
+    return plugin.hooks['page:before'].bind(instance)(page)
       .then(() => {
         const expected = `one
 if true
@@ -55,7 +76,7 @@ two
 two
 `
     }
-    return plugin.hooks['page:before'](page)
+    return plugin.hooks['page:before'].bind(instance)(page)
       .then(() => {
         const expected = `one
 if (true) {
@@ -68,27 +89,38 @@ two
       })
   })
 
-  it("preserves the link and appends FILE NOT FOUND", () => {
-    const page = {
-      rawPath: __filename,
-      content: `[snippet](nosuch.js)`
-    }
-    return plugin.hooks['page:before'](page)
-      .then(() => {
-        const expected =  `[snippet](nosuch.js) *FILE NOT FOUND: nosuch.js*`
-        assert.equal(page.content, expected)
-      })
+  describe('warnings', () => {
+    beforeEach(() => {
+      instance.options.pluginsConfig.snippet.problem = 'warn'
+    })
+
+    it("preserves the link and appends FILE NOT FOUND", () => {
+      const page = {
+        rawPath: __filename,
+        content: `[snippet](nosuch.js)`
+      }
+      return plugin.hooks['page:before'].bind(instance)(page)
+        .then(() => {
+          const expected = `[snippet](nosuch.js) *FILE NOT FOUND: nosuch.js*`
+          assert.equal(page.content, expected)
+          assert.deepEqual(warnings, ["nosuch.js: " + expected])
+          assert.deepEqual(errors, [])
+        })
+    })
+
+    it("preserves the link and appends FRAGMENT NOT FOUND", () => {
+      const page = {
+        rawPath: __filename,
+        content: `[snippet](hello.rb#nosuch)`
+      }
+      return plugin.hooks['page:before'].bind(instance)(page)
+        .then(() => {
+          const expected = `[snippet](hello.rb#nosuch) *FRAGMENT NOT FOUND: hello.rb#nosuch*`
+          assert.equal(page.content, expected)
+          assert.deepEqual(warnings, ["hello.rb: " + expected])
+          assert.deepEqual(errors, [])
+        })
+    })
   })
 
-  it("preserves the link and appends FRAGMENT NOT FOUND", () => {
-    const page = {
-      rawPath: __filename,
-      content: `[snippet](hello.rb#nosuch)`
-    }
-    return plugin.hooks['page:before'](page)
-      .then(() => {
-        const expected =  `[snippet](hello.rb#nosuch) *FRAGMENT NOT FOUND: hello.rb#nosuch*`
-        assert.equal(page.content, expected)
-      })
-  })
 })

@@ -8,9 +8,16 @@ Include entire code files or fragments of code files in your pages.
 {
   "plugins": [
     "snippet@git+https://github.com/cucumber-ltd/gitbook-plugin-snippet.git"
-  ]
+  ],
+  "pluginsConfig": {
+    "snippet": {
+      "problem": "fail"
+    }
+  }
 }
 ```
+
+The `problem` property can be `"warn"` ,`"error"` or `"fail"`. Default is `"error"`.
 
 ## Include entire file
 
