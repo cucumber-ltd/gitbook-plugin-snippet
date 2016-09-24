@@ -7,7 +7,7 @@ module.exports = {
     'page:before': function (page) {
       const options = Object.assign({problem: 'error'}, this.options.pluginsConfig["snippet"])
       const problem = (filename, message) => {
-        const fullMessage = `${filename}: ${message}`
+        const fullMessage = `${filename}: ${message}\n`
         switch (options.problem) {
           case 'warn': {
             this.log.warn(fullMessage)
