@@ -81,7 +81,7 @@ Note that the fragment has been unindented while preserving whitespace.
 
 ## Include files from git
 
-Just apend `@` after the marker, followed by the commit message (or substring of commit message). Example:
+Just append `@` after the marker, followed by the commit message (or substring of commit message). Example:
 
     [snippet](some/file-with-fragment.rb#the-marker@this fixes a bug)
 
