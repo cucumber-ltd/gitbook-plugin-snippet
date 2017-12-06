@@ -103,7 +103,7 @@ two
         .then(() => {
           const expected = `[snippet](nosuch.js) *FILE NOT FOUND: nosuch.js*`
           assert.equal(page.content, expected)
-          assert.deepEqual(warnings, ["nosuch.js: " + expected])
+          assert.deepEqual(warnings.map(x => x.trim()), ["nosuch.js: " + expected])
           assert.deepEqual(errors, [])
         })
     })
@@ -117,7 +117,7 @@ two
         .then(() => {
           const expected = `[snippet](hello.rb#nosuch) *FRAGMENT NOT FOUND: hello.rb#nosuch*`
           assert.equal(page.content, expected)
-          assert.deepEqual(warnings, ["hello.rb: " + expected])
+          assert.deepEqual(warnings.map(x => x.trim()), ["hello.rb: " + expected])
           assert.deepEqual(errors, [])
         })
     })
@@ -125,19 +125,20 @@ two
 
   describe("git history", () => {
     it("includes the fragment from file based on commit message", () => {
-      const commitMessage = "very special"
+      const commitMessage = "First commit"
       const page = {
         rawPath: __filename,
         content: `one
-[snippet](on-branch.rb#marker@${commitMessage})
+[snippet](fragment.rb#the-fragment@${commitMessage})
 two
 `
       }
       return plugin.hooks['page:before'].bind(instance)(page)
         .then(() => {
           const expected = `one
-
-puts "world"
+if true
+  puts "the fragment"
+end
 
 two
 `
