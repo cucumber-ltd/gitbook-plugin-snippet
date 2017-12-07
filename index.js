@@ -3,6 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 const child_process = require('child_process')
+const unindent = require('unindent')
 
 module.exports = {
   hooks: {
@@ -83,10 +84,4 @@ module.exports = {
         })
     }
   }
-}
-
-const unindent = s => {
-  // https://twitter.com/gasparnagy/status/778134306128551940
-  for (; !s.match(/^\S/m); s = s.replace(/^\s/gm, ''));
-  return s
 }

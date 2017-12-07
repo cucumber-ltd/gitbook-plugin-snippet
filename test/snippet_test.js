@@ -58,8 +58,11 @@ two
     return plugin.hooks['page:before'].bind(instance)(page)
       .then(() => {
         const expected = `one
+
 if true
-  puts "the fragment"
+  puts "the fragment 1"
+
+  puts "the fragment 2"
 end
 
 two
@@ -79,8 +82,11 @@ two
     return plugin.hooks['page:before'].bind(instance)(page)
       .then(() => {
         const expected = `one
+
 if (true) {
-  console.log("the fragment")
+  console.log("the fragment 1")
+
+  console.log("the fragment 2")
 }
 
 two
@@ -136,6 +142,7 @@ two
       return plugin.hooks['page:before'].bind(instance)(page)
         .then(() => {
           const expected = `one
+
 if true
   puts "the fragment"
 end
